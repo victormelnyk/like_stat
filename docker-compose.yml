@@ -1,0 +1,18 @@
+version: '2'
+services:
+  like-stat-server:
+    image: victormelnyk/like-stat-server
+    container_name: like-stat-server
+    build: ./server
+    ports:
+      - "2030:2030"
+  like-stat-client:
+    image: victormelnyk/like-stat-client
+    container_name: like-stat-client
+    build: ./client
+    ports:
+      - "2036:2036"
+    links:
+      - like-stat-server
+    depends_on:
+      - like-stat-server

@@ -4,7 +4,11 @@
   "description": "LikeStatClient",
   "main": "src/index.html",
   "scripts": {
+    "start": "http-server src/ -p 2036",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Victor Melnyk"
+  "author": "Victor Melnyk",
+  "devDependencies": {
+    "http-server": "^0.9.0"
+  }
 }
