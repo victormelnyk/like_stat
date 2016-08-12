@@ -1,0 +1,10 @@
+{
+  "name": "lsc",
+  "version": "1.0.0",
+  "description": "LikeStatClient",
+  "main": "src/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Victor Melnyk"
+}
