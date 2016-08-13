@@ -11,7 +11,7 @@ services:
     container_name: like-stat-client
     build: ./client
     ports:
-      - "2036:2036"
+      - "2036:80"
     links:
       - like-stat-server
     depends_on:

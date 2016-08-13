@@ -1,12 +1,4 @@
-FROM node
+FROM nginx:1.11
+COPY src /usr/share/nginx/html
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
-COPY src /usr/src/app/src
-COPY package.json /usr/src/app/
-COPY node_modules /usr/src/app/node_modules
-
-EXPOSE 3016
-
-CMD [ "npm", "start" ]
+#EXPOSE 2036
