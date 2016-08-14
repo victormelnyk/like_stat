@@ -11,8 +11,9 @@ function request(name, params) {
 
   logger.debug('Request', url);
   return rp(url).then(res => {
-    logger.debug('Responce', res);
-    return res;
+    const resObject = JSON.parse(res)
+    logger.debug('Responce', resObject);
+    return resObject;
   }, err => {
     logger.debug('Request error', err);
     return Promise.reject(err);

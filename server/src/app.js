@@ -3,19 +3,18 @@
 const express = require('express');
 
 const logger = require('./logger').get('app');
-const vk = require('./vkRequest');
+const process = require('./process');
 
 const port = 2030;
 
 const app = express();
 
 app.get('/', (req, res) => {
-  vk('users.get', {user_ids: 18302394})
+  process('victormelnyk')
     .then(data => {
       logger.log(data);
       res.send(data);
-    })
-    .catch(err => {
+    }, err => {
       logger.error(err);
       res.status(500).send(err);
     });
@@ -24,3 +23,10 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   logger.info(`Example app listening on port ${port}!`);
 });
+
+process('victormelnyk')
+  .then(data => {
+    logger.log(data);
+  }, err => {
+    logger.error(err);
+  });
