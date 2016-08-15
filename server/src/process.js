@@ -45,7 +45,11 @@ function getFriends(user) {
       logger.debug('getFriends response', user.id, count, friends.length, friends);
 
       user.friends = friends;
-      user.friends = [user.friends[0]]; //todo test
+
+      user.friends.forEach((friend, index) =>
+        logger.warn(friend.firstName, friend.lastName, index));
+
+      user.friends = [user.friends[98]]; //todo test
 
       return user;
     });
@@ -71,6 +75,7 @@ function getFriendWallItems(user, friend) {
         wallItems.length);
 
       friend.wallItems = wallItems;
+      friend.wallItems = wallItems.slice(0, 300); // todo test
 
       return friend;
     });
@@ -120,7 +125,7 @@ function getFriendsWallItemsLikeUserIds(user) {
 }
 
 function getFriendWallItemLikeUserIds(user, friend, wallItem) {
-  logger.debug('getFriendWallItemLikeUserIds', user.id);
+  logger.debug('getFriendWallItemLikeUserIds', user.id, friend.id, wallItem.id);
 
   return vk.get('likes.getList', {
     type: 'post',
@@ -134,7 +139,7 @@ function getFriendWallItemLikeUserIds(user, friend, wallItem) {
         likeUserIds = utils.get(likeData, 'items');
 
       logger.debug('getFriendWallItemLikeUserIds response', user.id,
-        friend.id, likeUserIds.length, likeUserIds);
+        friend.id, wallItem.id, likeUserIds.length, likeUserIds);
 
       wallItem.likeUserIds = likeUserIds;
 

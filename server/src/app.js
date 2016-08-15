@@ -20,9 +20,9 @@ app.get('/', (req, res) => {
     });
 });
 
-app.listen(port, () => {
-  logger.info(`Example app listening on port ${port}!`);
-});
+// app.listen(port, () => {
+//   logger.info(`Example app listening on port ${port}!`);
+// });
 
 process('victormelnyk')
   .then(data => {
