@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const cors = require('cors');
 
 const logger = require('./logger').get('app');
 const process = require('./process');
@@ -8,6 +9,8 @@ const process = require('./process');
 const port = 2030;
 
 const app = express();
+
+app.use(cors());
 
 app.get('/:userKey', (req, res) => {
   process(req.params.userKey)

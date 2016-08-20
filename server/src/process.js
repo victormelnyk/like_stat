@@ -11,13 +11,17 @@ const vk = new VkRequest();
 function getUser(user) {
   logger.debug('getUser', user.key);
 
-  return vk.get('users.get', {user_ids: user.key})
+  return vk.get('users.get', {
+    user_ids: user.key,
+    fields: "first_name,last_name,photo_100"
+  })
     .then(users => {
       const userRaw = users[0];
 
       user.id = utils.get(userRaw, 'id');
       user.firstName = utils.get(userRaw, 'first_name');
       user.lastName = utils.get(userRaw, 'last_name');
+      user.photo = utils.get(userRaw, 'photo_100');
 
       logger.debug('getUser response', user.key, user);
 

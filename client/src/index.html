@@ -1,1 +1,73 @@
-<h1>Like Stat</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css"
+        integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY"
+        crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+
+  <h2>Like Stat</h2>
+
+  <form>
+    <div class="form-group row">
+      <label for="userKey" class="col-sm-2 col-form-label">User ID</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" id="userKey"
+               placeholder="User ID" value="victormelnyk">
+      </div>
+      <div class="col-sm-2">
+        <button type="button" class="btn btn-primary" onclick="start()">Start</button>
+      </div>
+    </div>
+  </form>
+
+</div>
+
+<div class="container" id="result" style="display: none">
+
+  <h3>User</h3>
+
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>Image</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr id="user"></tr>
+    </tbody>
+  </table>
+
+  <h3>Friends</h3>
+
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Image</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Like Count</th>
+    </tr>
+    </thead>
+    <tbody id="friends"></tbody>
+  </table>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
+
+<script src="app.js"></script>
+
+</body>
+</html>
