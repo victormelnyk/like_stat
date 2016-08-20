@@ -1,25 +1,25 @@
 'use strict';
 
+const _ = require('underscore');
+
 const logger = require('./logger').get('process');
 const utils = require('./utils');
 const VkRequest = require('./vkRequest');
 
 const vk = new VkRequest();
 
-function getUser(userKey) {
-  logger.debug('getUser', userKey);
+function getUser(user) {
+  logger.debug('getUser', user.key);
 
-  return vk.get('users.get', {user_ids: userKey})
+  return vk.get('users.get', {user_ids: user.key})
     .then(users => {
       const userRaw = users[0];
 
-      const user = {
-        id: utils.get(userRaw, 'id'),
-        firstName: utils.get(userRaw, 'first_name'),
-        lastName: utils.get(userRaw, 'last_name')
-      };
+      user.id = utils.get(userRaw, 'id');
+      user.firstName = utils.get(userRaw, 'first_name');
+      user.lastName = utils.get(userRaw, 'last_name');
 
-      logger.debug('getUser response', userKey, user);
+      logger.debug('getUser response', user.key, user);
 
       return user;
     });
@@ -30,8 +30,8 @@ function getFriends(user) {
 
   return vk.get('friends.get', {
     user_id: user.id,
-    order: 'hints',
-    fields: 'first_name,last_name'
+    //order: 'name',
+    fields: 'first_name,last_name,photo_100'
   })
     .then(friendsData => {
       const count = utils.get(friendsData, 'count'),
@@ -39,17 +39,18 @@ function getFriends(user) {
         friends = items.map(friendRaw => ({
           id: utils.get(friendRaw, 'id'),
           firstName: utils.get(friendRaw, 'first_name'),
-          lastName: utils.get(friendRaw, 'last_name')
+          lastName: utils.get(friendRaw, 'last_name'),
+          photo: utils.get(friendRaw, 'photo_100'),
+
+          wallItems: []
         }));
 
       logger.debug('getFriends response', user.id, count, friends.length, friends);
 
       user.friends = friends;
 
-      user.friends.forEach((friend, index) =>
-        logger.warn(friend.firstName, friend.lastName, index));
-
-      user.friends = [user.friends[98]]; //todo test
+      user.friends.forEach((friend, index) => logger.warn(friend.firstName, friend.lastName, index));
+      //user.friends = [user.friends[0]]; //todo test
 
       return user;
     });
@@ -75,9 +76,16 @@ function getFriendWallItems(user, friend) {
         wallItems.length);
 
       friend.wallItems = wallItems;
-      friend.wallItems = wallItems.slice(0, 300); // todo test
 
       return friend;
+    }, err => {
+      if (_.has(err, 'error_code')) {
+        logger.warn('getFriendWallItems error', user.id, friend.id, err);
+
+        friend.wallItems = [];
+        friend.wallErrorCode = utils.get(err, 'error_code');
+        friend.wallErrorMsg = utils.get(err, 'error_msg');
+      }
     });
 }
 
@@ -168,12 +176,28 @@ function calculateFriendsWallLikeCount(user) {
 function trimUser(user) {
   logger.debug('trimUser', user.id);
 
-  user.friends = user.friends.map(friend => ({
-    id: friend.id,
-    firstName: friend.firstName,
-    lastName: friend.lastName,
-    wallLikeCount: friend.wallLikeCount
-  }));
+  user.friends = user.friends.map(friend => {
+    const resultFriend = {
+      id: friend.id,
+      firstName: friend.firstName,
+      lastName: friend.lastName,
+      photo: friend.photo,
+
+      wallLikeCount: friend.wallLikeCount
+    };
+
+    if (friend.wallErrorCode) {
+      resultFriend.wallErrorCode = friend.wallErrorCode;
+      resultFriend.wallErrorMsg = friend.wallErrorMsg;
+    }
+
+    return resultFriend;
+  });
+
+  user.friends = _.sortBy(user.friends, friend => friend.wallLikeCount ?
+    friend.wallLikeCount : Number.MAX_SAFE_INTEGER);
+
+  delete user.startTime;
 
   logger.info('trimUser', user.id, user);
 
@@ -181,23 +205,36 @@ function trimUser(user) {
 }
 
 function stat(user) {
-  logger.info('stat', user.id, vk.count);
+  logger.info('stat', {
+    userId: user.id,
+    requestCount: vk.count,
+    time: ((new Date() - user.startTime) / 1000).toFixed(1)
+  });
+  return user;
+}
+
+function init(userKey) {
+  return Promise.resolve({
+    key: userKey,
+    startTime: new Date()
+  });
 }
 
 function process(userKey) {
   logger.debug('process', userKey);
 
-  return getUser(userKey)
+  return init(userKey)
+    .then(user => getUser(user))
     .then(user => getFriends(user))
-    .then(user => getFriendsWallItems(user))
-    .then(user => getFriendsWallItemsLikeUserIds(user))
-    .then(user => calculateFriendsWallLikeCount(user))
-    .then(user => trimUser(user))
+    //.then(user => getFriendsWallItems(user))
+    //.then(user => getFriendsWallItemsLikeUserIds(user))
+    //.then(user => calculateFriendsWallLikeCount(user))
     .then(user => stat(user))
+    .then(user => trimUser(user))
     .catch(err => {
       logger.error('process error', userKey, err);
       return Promise.reject({error: `Server error for ${userKey}`});
-    })
+    });
 }
 
 module.exports = process;

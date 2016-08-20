@@ -9,8 +9,8 @@ const port = 2030;
 
 const app = express();
 
-app.get('/', (req, res) => {
-  process('victormelnyk')
+app.get('/:userKey', (req, res) => {
+  process(req.params.userKey)
     .then(data => {
       logger.log(data);
       res.send(data);
@@ -20,13 +20,13 @@ app.get('/', (req, res) => {
     });
 });
 
-// app.listen(port, () => {
-//   logger.info(`Example app listening on port ${port}!`);
-// });
+app.listen(port, () => {
+  logger.info(`Example app listening on port ${port}!`);
+});
 
-process('victormelnyk')
-  .then(data => {
-    logger.log(data);
-  }, err => {
-    logger.error(err);
-  });
+// process('victormelnyk')
+//   .then(data => {
+//     logger.log(data);
+//   }, err => {
+//     logger.error(err);
+//   });
