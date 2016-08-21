@@ -13,6 +13,12 @@ function load(userKey) {
 
   $.getJSON(url, user => {
     render(user);
+
+    if (user.inProgres) {
+      setTimeout(() => {
+        load(userKey);
+      }, 5000);
+    }
   }).fail(error => {
     console.error(error);
   });
