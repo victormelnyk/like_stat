@@ -10,7 +10,7 @@ class VkRequest {
   constructor() {
     this.count = 0;
     this.inProgressCount = 0;
-    this.inProgressMaxCount = 10;
+    this.inProgressMaxCount = 20;
     this.queue = [];
   }
 

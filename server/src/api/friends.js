@@ -29,7 +29,8 @@ function getFriends(userId, request) {
 
       logger.debug('getFriends response', userId, count, friends.length, friends);
 
-      return [friends[2]];
+      //return [friends[2]];
+      return friends;
     });
 }
 
