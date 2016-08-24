@@ -3,7 +3,7 @@
 const logger = require('../logger').get('api/users');
 const utils = require('../utils');
 
-function getUser(userKey, user, request) {
+function getUser(request, userKey, user) {
   logger.debug('getUser', userKey);
 
   return request.get('users.get', {

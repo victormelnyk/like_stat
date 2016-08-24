@@ -5,7 +5,7 @@ const utils = require('../utils');
 
 const Friend = require('../models/friend');
 
-function getFriends(userId, request) {
+function getFriends(request, userId) {
   logger.debug('getFriends', userId);
 
   return request.get('friends.get', {
@@ -34,7 +34,19 @@ function getFriends(userId, request) {
     });
 }
 
+function getUserFriends(user) {
+  logger.debug('getUserFriends', user.id);
+
+  return getFriends(user.request, user.id)
+    .then(friends => {
+      logger.debug('getUserFriends response', user.id, friends.length);
+
+      user.friends = friends;
+      return user
+    })
+}
+
 
 module.exports = {
-  getFriends
+  getUserFriends
 };

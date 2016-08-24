@@ -48,6 +48,7 @@ function render(user) {
     $friend.append($('<td>').append($('<img>').addClass('img-rounded').attr('src', friend.photo)));
     $friend.append($('<td>').html(friend.firstName));
     $friend.append($('<td>').html(friend.lastName));
+    $friend.append($('<td>').html(friend.wallItemCount));
     $friend.append($('<td>').html(friend.wallLikeCount));
 
     $friends.append($friend);

@@ -6,28 +6,16 @@ const logger = require('./logger').get('process');
 const utils = require('./utils');
 
 const getUser = require('./api/users').getUser;
-const getFriends = require('./api/friends').getFriends;
-const getFriendsWallItems = require('./api/wall').getFriendsWallItems;
-const getFriendsWallItemsLikeUserIds = require('./api/likes').getFriendsWallItemsLikeUserIds;
+const getUserFriends = require('./api/friends').getUserFriends;
+const getUserFriendsWallItemsLikeCount = require('./api/wall').getUserFriendsWallItemsLikeCount;
 
 const VkRequest = require('./vkRequest');
 const User = require('./models/user');
 
-
 const users = {};
 
-function calculateFriendsWallLikeCount(user) {
-  logger.debug('calculateFriendsWallLikeCount', user.id);
-
-  user.friends.forEach(friend => {
-    friend.wallItems.forEach(wallItem => {
-      if (wallItem.likeUserIds.indexOf(user.id) !== -1) {
-        friend.wallLikeCount++;
-      }
-    });
-
-    logger.debug('calculateFriendsWallLikeCount result', user.id, friend.id, friend.wallLikeCount);
-  });
+function trimUser(user) {
+  logger.debug('trimUser', user.id);
 
   user.finishTime = new Date();
   user.time = ((user.finishTime - user.startTime) / 1000).toFixed(1);
@@ -38,12 +26,6 @@ function calculateFriendsWallLikeCount(user) {
     requestCount: user.request.count,
     time: user.time
   });
-
-  return user;
-}
-
-function trimUser(user) {
-  logger.debug('trimUser', user.id);
 
   user.friends = user.friends.map(friend => {
     friend.wallItems = [];
@@ -71,7 +53,7 @@ function initUser(userKey) {
 }
 
 function process(userKey) {
-  logger.debug('getUser', userKey);
+  logger.debug('process', userKey);
 
   let user;
 
@@ -83,29 +65,20 @@ function process(userKey) {
     load(user);
   }
 
-  user.friends = _.sortBy(user.friends, friend => friend.wallLikeCount ?
-    friend.wallLikeCount : Number.MAX_SAFE_INTEGER);
+  user.friends = _.sortBy(user.friends, friend => friend.wallLikeCount * -1);
 
   return Promise.resolve(user);
 }
 
 function load(user) {
-  logger.debug('process', user.key);
+  logger.debug('load', user.key);
 
-  return getUser(user.key, user, user.request)
-    .then(user => getFriends(user.id, user.request))
-    .then(friends => {
-      user.friends = friends;
-
-      return user;
-    })
-    .then(user => getFriendsWallItems(user))
-    .then(user => getFriendsWallItemsLikeUserIds(user))
-    .then(user => calculateFriendsWallLikeCount(user))
+  return getUser(user.request, user.key, user)
+    .then(user => getUserFriends(user))
+    .then(user => getUserFriendsWallItemsLikeCount(user))
     .then(user => trimUser(user))
     .catch(err => {
-      logger.error('process error', userKey, err);
-      return Promise.reject({error: `Server error for ${userKey}`});
+      logger.error('process error', user.key, err);
     });
 }
 

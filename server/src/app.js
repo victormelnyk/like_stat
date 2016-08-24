@@ -27,7 +27,7 @@ app.listen(port, () => {
   logger.info(`Example app listening on port ${port}!`);
 });
 
-// process('victormelnyk')
+// process('dev_flit')
 //   .then(data => {
 //     logger.log(data);
 //   }, err => {

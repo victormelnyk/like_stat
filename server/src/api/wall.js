@@ -1,6 +1,8 @@
 const logger = require('../logger').get('api/wall');
 const utils = require('../utils');
 
+const setUserFriendWallItemsLikeCount = require('./likes').setUserFriendWallItemsLikeCount;
+
 function getFriendsWallItems(user) {
   logger.debug('getFriendsWallItems', user.id, user.friends.length);
 
@@ -21,6 +23,7 @@ function getFriendWallItems(user, friend) {
         wallItems.length);
 
       friend.wallItems = wallItems;
+      friend.wallItemCount = wallItems.length;
 
       return friend;
     }, err => {
@@ -29,7 +32,10 @@ function getFriendWallItems(user, friend) {
 
         friend.wallErrorCode = utils.get(err, 'error_code');
         friend.wallErrorMsg = utils.get(err, 'error_msg');
+
+        return friend;
       }
+      return Promise.reject(err);
     });
 }
 
@@ -55,6 +61,28 @@ function getFriendWallItemsPart(user, friend, offset, resultWellItems) {
     });
 }
 
+function getUserFriendsWallItemsLikeCount(user) {
+  logger.debug('getUserFriendsWallItemsLikeCount', user.id, user.friends.length);
+
+  return Promise.all(user.friends.map(friend => getUserFriendWallItemsLikeCount(user, friend)))
+    .then(friends => {
+      logger.debug('getUserFriendsWallItemsLikeCount response', user.id, friends.length);
+
+      return user;
+    });
+}
+
+function getUserFriendWallItemsLikeCount(user, friend) {
+  logger.debug('getUserFriendWallItemsLikeCount', user.id, friend.id);
+
+  return getFriendWallItems(user, friend)
+    .then(friend => {
+      logger.debug('getUserFriendWallItemsLikeCount response', user.id, friend.id, friend.wallItems.length);
+
+      return setUserFriendWallItemsLikeCount(user, friend);
+    })
+}
+
 module.exports = {
-  getFriendsWallItems
+  getUserFriendsWallItemsLikeCount
 };
